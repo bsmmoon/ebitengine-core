@@ -58,30 +58,6 @@ func init() {
 	uiFaceSource = s
 }
 
-type imageType int
-
-const (
-	imageTypeButton imageType = iota
-	imageTypeButtonPressed
-	imageTypeTextBox
-	imageTypeVScrollBarBack
-	imageTypeVScrollBarFront
-	imageTypeCheckBox
-	imageTypeCheckBoxPressed
-	imageTypeCheckBoxMark
-)
-
-var imageSrcRects = map[imageType]image.Rectangle{
-	imageTypeButton:          image.Rect(0, 0, 16, 16),
-	imageTypeButtonPressed:   image.Rect(16, 0, 32, 16),
-	imageTypeTextBox:         image.Rect(0, 16, 16, 32),
-	imageTypeVScrollBarBack:  image.Rect(16, 16, 24, 32),
-	imageTypeVScrollBarFront: image.Rect(24, 16, 32, 32),
-	imageTypeCheckBox:        image.Rect(0, 32, 16, 48),
-	imageTypeCheckBoxPressed: image.Rect(16, 32, 32, 48),
-	imageTypeCheckBoxMark:    image.Rect(32, 32, 48, 48),
-}
-
 const (
 	screenWidth  = 640
 	screenHeight = 480
@@ -119,11 +95,11 @@ func (b *Button) Update() {
 }
 
 func (b *Button) Draw(dst *ebiten.Image) {
-	t := imageTypeButton
+	t := example_ui.ImageTypeButton
 	if b.mouseDown {
-		t = imageTypeButtonPressed
+		t = example_ui.ImageTypeButtonPressed
 	}
-	example_ui.DrawNinePatches(uiImage, dst, b.Rect, imageSrcRects[t])
+	example_ui.DrawNinePatches(uiImage, dst, b.Rect, example_ui.ImageSrcRects[t])
 
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(b.Rect.Min.X+b.Rect.Max.X)/2, float64(b.Rect.Min.Y+b.Rect.Max.Y)/2)
@@ -220,12 +196,12 @@ func (v *VScrollBar) Update(contentHeight int) {
 	}
 }
 
-func (v *VScrollBar) Draw(dst *ebiten.Image) {
+func (v *VScrollBar) Draw(uiImage *ebiten.Image, dst *ebiten.Image) {
 	sd := image.Rect(v.X, v.Y, v.X+VScrollBarWidth, v.Y+v.Height)
-	example_ui.DrawNinePatches(uiImage, dst, sd, imageSrcRects[imageTypeVScrollBarBack])
+	example_ui.DrawNinePatches(uiImage, dst, sd, example_ui.ImageSrcRects[example_ui.ImageTypeVScrollBarBack])
 
 	if v.thumbRate < 1 {
-		example_ui.DrawNinePatches(uiImage, dst, v.thumbRect(), imageSrcRects[imageTypeVScrollBarFront])
+		example_ui.DrawNinePatches(uiImage, dst, v.thumbRect(), example_ui.ImageSrcRects[example_ui.ImageTypeVScrollBarFront])
 	}
 }
 
@@ -280,7 +256,7 @@ func (t *TextBox) contentOffset() (int, int) {
 }
 
 func (t *TextBox) Draw(dst *ebiten.Image) {
-	example_ui.DrawNinePatches(uiImage, dst, t.Rect, imageSrcRects[imageTypeTextBox])
+	example_ui.DrawNinePatches(uiImage, dst, t.Rect, example_ui.ImageSrcRects[example_ui.ImageTypeTextBox])
 
 	textOp := &text.DrawOptions{}
 	x := -float64(t.offsetX) + textBoxPaddingLeft
@@ -294,7 +270,7 @@ func (t *TextBox) Draw(dst *ebiten.Image) {
 		Size:   uiFontSize,
 	}, textOp)
 
-	t.vScrollBar.Draw(dst)
+	t.vScrollBar.Draw(uiImage, dst)
 }
 
 const (
@@ -342,14 +318,14 @@ func (c *CheckBox) Update() {
 }
 
 func (c *CheckBox) Draw(dst *ebiten.Image) {
-	t := imageTypeCheckBox
+	t := example_ui.ImageTypeCheckBox
 	if c.mouseDown {
-		t = imageTypeCheckBoxPressed
+		t = example_ui.ImageTypeCheckBoxPressed
 	}
 	r := image.Rect(c.X, c.Y, c.X+checkboxWidth, c.Y+checkboxHeight)
-	example_ui.DrawNinePatches(uiImage, dst, r, imageSrcRects[t])
+	example_ui.DrawNinePatches(uiImage, dst, r, example_ui.ImageSrcRects[t])
 	if c.checked {
-		example_ui.DrawNinePatches(uiImage, dst, r, imageSrcRects[imageTypeCheckBoxMark])
+		example_ui.DrawNinePatches(uiImage, dst, r, example_ui.ImageSrcRects[example_ui.ImageTypeCheckBoxMark])
 	}
 
 	x := c.X + checkboxWidth + checkboxPaddingLeft

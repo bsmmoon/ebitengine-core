@@ -24,9 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Use a shared, writable module cache path and pre-create it
 ARG USERNAME=vscode
-ENV GOPATH=/go \
-    GOMODCACHE=/go/pkg/mod
-RUN mkdir -p /go/pkg/mod && chown -R ${USERNAME}:${USERNAME} /go
+RUN mkdir -p /go/pkg/mod/cache/download && chown -R ${USERNAME}:${USERNAME} /go
 
 # Project Setup
 WORKDIR /app

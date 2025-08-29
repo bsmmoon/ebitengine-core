@@ -1,0 +1,3 @@
+# we need xvfb to run ebiten tests in CI
+test:
+	xvfb-run -a -s "-screen 0 1024x768x24" go test ./...

@@ -1,1 +1,2 @@
-# shortcuts
+update:
+	go mod tidy

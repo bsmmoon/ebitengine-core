@@ -10,6 +10,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     golang-go \
   && rm -rf /var/lib/apt/lists/*
 
+# Dependencies for GUI applications
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libx11-dev \
+    libxcursor-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxi-dev \
+    libgl1-mesa-dev \
+    libxxf86vm-dev \
+    xvfb xauth \
+  && rm -rf /var/lib/apt/lists/*
+
 # Project Setup
 WORKDIR /app
 

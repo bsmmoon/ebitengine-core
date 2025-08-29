@@ -1,0 +1,12 @@
+### repository policy
+* text=auto eol=lf
+
+# Keep Windows scripts usable if you have them
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Never touch binaries
+*.png binary
+*.jpg binary
+*.pdf binary

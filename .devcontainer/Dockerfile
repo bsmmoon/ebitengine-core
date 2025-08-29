@@ -22,12 +22,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xvfb xauth \
   && rm -rf /var/lib/apt/lists/*
 
+# Use a shared, writable module cache path and pre-create it
+ARG USERNAME=vscode
+ENV GOPATH=/go \
+    GOMODCACHE=/go/pkg/mod
+RUN mkdir -p /go/pkg/mod && chown -R ${USERNAME}:${USERNAME} /go
+
 # Project Setup
 WORKDIR /app
-
-# Step 1: Copy go.mod and go.sum files
 COPY go.mod go.sum ./
-
-# Step 2: Download all dependencies with a cache mount
-RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download
+RUN go mod download

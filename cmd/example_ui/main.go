@@ -35,26 +35,27 @@ const (
 	lineSpacingInPixels = 16
 )
 
-var (
+type Context struct {
 	uiImage      *ebiten.Image
 	uiFaceSource *text.GoTextFaceSource
-)
+}
 
-func init() {
-	// Decode an image from the image file's byte slice.
+func NewContext() *Context {
 	img, _, err := image.Decode(bytes.NewReader(images.UI_png))
 	if err != nil {
 		log.Fatal(err)
 	}
-	uiImage = ebiten.NewImageFromImage(img)
-}
+	uiImage := ebiten.NewImageFromImage(img)
 
-func init() {
 	s, err := text.NewGoTextFaceSource(bytes.NewReader(goregular.TTF))
 	if err != nil {
 		log.Fatal(err)
 	}
-	uiFaceSource = s
+
+	return &Context{
+		uiImage:      uiImage,
+		uiFaceSource: s,
+	}
 }
 
 type imageType int
@@ -90,7 +91,7 @@ type Input struct {
 	mouseButtonState int
 }
 
-func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.Rectangle) {
+func (c *Context) drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.Rectangle) {
 	srcX := srcRect.Min.X
 	srcY := srcRect.Min.Y
 	srcW := srcRect.Dx()
@@ -138,7 +139,7 @@ func drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, srcRect image.R
 			op.GeoM.Scale(float64(dw)/float64(sw), float64(dh)/float64(sh))
 			op.GeoM.Translate(float64(dx), float64(dy))
 			op.GeoM.Translate(float64(dstX), float64(dstY))
-			dst.DrawImage(uiImage.SubImage(image.Rect(sx, sy, sx+sw, sy+sh)).(*ebiten.Image), op)
+			dst.DrawImage(c.uiImage.SubImage(image.Rect(sx, sy, sx+sw, sy+sh)).(*ebiten.Image), op)
 		}
 	}
 }
@@ -170,12 +171,12 @@ func (b *Button) Update() {
 	}
 }
 
-func (b *Button) Draw(dst *ebiten.Image) {
+func (b *Button) Draw(dst *ebiten.Image, ctx *Context) {
 	t := imageTypeButton
 	if b.mouseDown {
 		t = imageTypeButtonPressed
 	}
-	drawNinePatches(dst, b.Rect, imageSrcRects[t])
+	ctx.drawNinePatches(dst, b.Rect, imageSrcRects[t])
 
 	op := &text.DrawOptions{}
 	op.GeoM.Translate(float64(b.Rect.Min.X+b.Rect.Max.X)/2, float64(b.Rect.Min.Y+b.Rect.Max.Y)/2)
@@ -184,7 +185,7 @@ func (b *Button) Draw(dst *ebiten.Image) {
 	op.PrimaryAlign = text.AlignCenter
 	op.SecondaryAlign = text.AlignCenter
 	text.Draw(dst, b.Text, &text.GoTextFace{
-		Source: uiFaceSource,
+		Source: ctx.uiFaceSource,
 		Size:   uiFontSize,
 	}, op)
 }
@@ -272,12 +273,12 @@ func (v *VScrollBar) Update(contentHeight int) {
 	}
 }
 
-func (v *VScrollBar) Draw(dst *ebiten.Image) {
+func (v *VScrollBar) Draw(dst *ebiten.Image, ctx *Context) {
 	sd := image.Rect(v.X, v.Y, v.X+VScrollBarWidth, v.Y+v.Height)
-	drawNinePatches(dst, sd, imageSrcRects[imageTypeVScrollBarBack])
+	ctx.drawNinePatches(dst, sd, imageSrcRects[imageTypeVScrollBarBack])
 
 	if v.thumbRate < 1 {
-		drawNinePatches(dst, v.thumbRect(), imageSrcRects[imageTypeVScrollBarFront])
+		ctx.drawNinePatches(dst, v.thumbRect(), imageSrcRects[imageTypeVScrollBarFront])
 	}
 }
 
@@ -331,8 +332,8 @@ func (t *TextBox) contentOffset() (int, int) {
 	return t.offsetX, t.offsetY
 }
 
-func (t *TextBox) Draw(dst *ebiten.Image) {
-	drawNinePatches(dst, t.Rect, imageSrcRects[imageTypeTextBox])
+func (t *TextBox) Draw(dst *ebiten.Image, ctx *Context) {
+	ctx.drawNinePatches(dst, t.Rect, imageSrcRects[imageTypeTextBox])
 
 	textOp := &text.DrawOptions{}
 	x := -float64(t.offsetX) + textBoxPaddingLeft
@@ -342,11 +343,11 @@ func (t *TextBox) Draw(dst *ebiten.Image) {
 	textOp.ColorScale.ScaleWithColor(color.Black)
 	textOp.LineSpacing = lineSpacingInPixels
 	text.Draw(dst.SubImage(t.Rect).(*ebiten.Image), t.Text, &text.GoTextFace{
-		Source: uiFaceSource,
+		Source: ctx.uiFaceSource,
 		Size:   uiFontSize,
 	}, textOp)
 
-	t.vScrollBar.Draw(dst)
+	t.vScrollBar.Draw(dst, ctx)
 }
 
 const (
@@ -366,18 +367,18 @@ type CheckBox struct {
 	onCheckChanged func(c *CheckBox)
 }
 
-func (c *CheckBox) width() int {
+func (c *CheckBox) width(ctx *Context) int {
 	w := text.Advance(c.Text, &text.GoTextFace{
-		Source: uiFaceSource,
+		Source: ctx.uiFaceSource,
 		Size:   uiFontSize,
 	})
 	return checkboxWidth + checkboxPaddingLeft + int(w)
 }
 
-func (c *CheckBox) Update() {
+func (c *CheckBox) Update(ctx *Context) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		if c.X <= x && x < c.X+c.width() && c.Y <= y && y < c.Y+checkboxHeight {
+		if c.X <= x && x < c.X+c.width(ctx) && c.Y <= y && y < c.Y+checkboxHeight {
 			c.mouseDown = true
 		} else {
 			c.mouseDown = false
@@ -393,15 +394,15 @@ func (c *CheckBox) Update() {
 	}
 }
 
-func (c *CheckBox) Draw(dst *ebiten.Image) {
+func (c *CheckBox) Draw(dst *ebiten.Image, ctx *Context) {
 	t := imageTypeCheckBox
 	if c.mouseDown {
 		t = imageTypeCheckBoxPressed
 	}
 	r := image.Rect(c.X, c.Y, c.X+checkboxWidth, c.Y+checkboxHeight)
-	drawNinePatches(dst, r, imageSrcRects[t])
+	ctx.drawNinePatches(dst, r, imageSrcRects[t])
 	if c.checked {
-		drawNinePatches(dst, r, imageSrcRects[imageTypeCheckBoxMark])
+		ctx.drawNinePatches(dst, r, imageSrcRects[imageTypeCheckBoxMark])
 	}
 
 	x := c.X + checkboxWidth + checkboxPaddingLeft
@@ -413,7 +414,7 @@ func (c *CheckBox) Draw(dst *ebiten.Image) {
 	op.PrimaryAlign = text.AlignStart
 	op.SecondaryAlign = text.AlignCenter
 	text.Draw(dst, c.Text, &text.GoTextFace{
-		Source: uiFaceSource,
+		Source: ctx.uiFaceSource,
 		Size:   uiFontSize,
 	}, op)
 }
@@ -427,6 +428,7 @@ func (c *CheckBox) SetOnCheckChanged(f func(c *CheckBox)) {
 }
 
 type Game struct {
+	uiContext  *Context
 	button1    *Button
 	button2    *Button
 	checkBox   *CheckBox
@@ -434,7 +436,9 @@ type Game struct {
 }
 
 func NewGame() *Game {
-	g := &Game{}
+	g := &Game{
+		uiContext: NewContext(),
+	}
 	g.button1 = &Button{
 		Rect: image.Rect(16, 16, 144, 48),
 		Text: "Button 1",
@@ -473,17 +477,17 @@ func NewGame() *Game {
 func (g *Game) Update() error {
 	g.button1.Update()
 	g.button2.Update()
-	g.checkBox.Update()
+	g.checkBox.Update(g.uiContext)
 	g.textBoxLog.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xeb, 0xeb, 0xeb, 0xff})
-	g.button1.Draw(screen)
-	g.button2.Draw(screen)
-	g.checkBox.Draw(screen)
-	g.textBoxLog.Draw(screen)
+	g.button1.Draw(screen, g.uiContext)
+	g.button2.Draw(screen, g.uiContext)
+	g.checkBox.Draw(screen, g.uiContext)
+	g.textBoxLog.Draw(screen, g.uiContext)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

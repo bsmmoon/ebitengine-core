@@ -15,6 +15,8 @@
 package main
 
 const (
-	screenHeight = 480
-	screenWidth  = 640
+	lineSpacingInPixels = 16
+	screenHeight        = 480
+	screenWidth         = 640
+	uiFontSize          = 12
 )

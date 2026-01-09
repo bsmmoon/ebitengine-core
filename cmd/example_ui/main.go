@@ -27,8 +27,8 @@ func main() {
 	if err := ebiten.RunGame(game.NewGame(game.GameConfig{
 		ScreenWidth:         screenWidth,
 		ScreenHeight:        screenHeight,
-		UIFontSize:          12,
-		LineSpacingInPixels: 16,
+		UIFontSize:          uiFontSize,
+		LineSpacingInPixels: lineSpacingInPixels,
 	})); err != nil {
 		log.Fatal(err)
 	}

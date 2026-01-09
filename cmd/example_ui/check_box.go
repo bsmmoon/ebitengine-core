@@ -14,6 +14,14 @@
 
 package main
 
+import (
+	"image"
+	"image/color"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
+)
+
 const (
 	checkboxWidth       = 16
 	checkboxHeight      = 16
@@ -29,4 +37,64 @@ type CheckBox struct {
 	mouseDown bool
 
 	onCheckChanged func(c *CheckBox)
+}
+
+func (c *CheckBox) width(ctx *GameContext) int {
+	w := text.Advance(c.Text, &text.GoTextFace{
+		Source: ctx.uiFaceSource,
+		Size:   uiFontSize,
+	})
+	return checkboxWidth + checkboxPaddingLeft + int(w)
+}
+
+func (c *CheckBox) Update(ctx *GameContext) {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		x, y := ebiten.CursorPosition()
+		if c.X <= x && x < c.X+c.width(ctx) && c.Y <= y && y < c.Y+checkboxHeight {
+			c.mouseDown = true
+		} else {
+			c.mouseDown = false
+		}
+	} else {
+		if c.mouseDown {
+			c.checked = !c.checked
+			if c.onCheckChanged != nil {
+				c.onCheckChanged(c)
+			}
+		}
+		c.mouseDown = false
+	}
+}
+
+func (c *CheckBox) Draw(dst *ebiten.Image, ctx *GameContext) {
+	t := imageTypeCheckBox
+	if c.mouseDown {
+		t = imageTypeCheckBoxPressed
+	}
+	r := image.Rect(c.X, c.Y, c.X+checkboxWidth, c.Y+checkboxHeight)
+	ctx.drawNinePatches(dst, r, t)
+	if c.checked {
+		ctx.drawNinePatches(dst, r, imageTypeCheckBoxMark)
+	}
+
+	x := c.X + checkboxWidth + checkboxPaddingLeft
+	y := c.Y + checkboxHeight/2
+	op := &text.DrawOptions{}
+	op.GeoM.Translate(float64(x), float64(y))
+	op.ColorScale.ScaleWithColor(color.Black)
+	op.LineSpacing = lineSpacingInPixels
+	op.PrimaryAlign = text.AlignStart
+	op.SecondaryAlign = text.AlignCenter
+	text.Draw(dst, c.Text, &text.GoTextFace{
+		Source: ctx.uiFaceSource,
+		Size:   uiFontSize,
+	}, op)
+}
+
+func (c *CheckBox) Checked() bool {
+	return c.checked
+}
+
+func (c *CheckBox) SetOnCheckChanged(f func(c *CheckBox)) {
+	c.onCheckChanged = f
 }

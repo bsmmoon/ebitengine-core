@@ -14,16 +14,9 @@
 
 package main
 
-import (
-	"log"
-
-	"github.com/hajimehoshi/ebiten/v2"
+const (
+	lineSpacingInPixels = 16
+	screenHeight        = 480
+	screenWidth         = 640
+	uiFontSize          = 12
 )
-
-func main() {
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("UI (Ebitengine Demo)")
-	if err := ebiten.RunGame(NewGame()); err != nil {
-		log.Fatal(err)
-	}
-}

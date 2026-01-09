@@ -14,16 +14,19 @@
 
 package main
 
-import (
-	"log"
-
-	"github.com/hajimehoshi/ebiten/v2"
+const (
+	checkboxWidth       = 16
+	checkboxHeight      = 16
+	checkboxPaddingLeft = 8
 )
 
-func main() {
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("UI (Ebitengine Demo)")
-	if err := ebiten.RunGame(NewGame()); err != nil {
-		log.Fatal(err)
-	}
+type CheckBox struct {
+	X    int
+	Y    int
+	Text string
+
+	checked   bool
+	mouseDown bool
+
+	onCheckChanged func(c *CheckBox)
 }

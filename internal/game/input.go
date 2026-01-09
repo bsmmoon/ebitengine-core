@@ -12,24 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package game
 
-import (
-	"log"
-
-	"github.com/bsmmoon/ebitengine-core/internal/game"
-	"github.com/hajimehoshi/ebiten/v2"
-)
-
-func main() {
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("UI (Ebitengine Demo)")
-	if err := ebiten.RunGame(game.NewGame(game.GameConfig{
-		ScreenWidth:         screenWidth,
-		ScreenHeight:        screenHeight,
-		UIFontSize:          12,
-		LineSpacingInPixels: 16,
-	})); err != nil {
-		log.Fatal(err)
-	}
+type Input struct {
+	mouseButtonState int
 }

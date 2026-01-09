@@ -17,13 +17,14 @@ package main
 import (
 	"log"
 
+	"github.com/bsmmoon/ebitengine-core/internal/game"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("UI (Ebitengine Demo)")
-	if err := ebiten.RunGame(NewGame()); err != nil {
+	if err := ebiten.RunGame(game.NewGame()); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -14,22 +14,9 @@
 
 package main
 
-import (
-	"log"
-
-	"github.com/bsmmoon/ebitengine-core/internal/game"
-	"github.com/hajimehoshi/ebiten/v2"
+const (
+	lineSpacingInPixels = 16
+	screenHeight        = 480
+	screenWidth         = 640
+	uiFontSize          = 12
 )
-
-func main() {
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("UI (Ebitengine Demo)")
-	if err := ebiten.RunGame(game.NewGame(game.GameConfig{
-		ScreenWidth:         screenWidth,
-		ScreenHeight:        screenHeight,
-		UIFontSize:          uiFontSize,
-		LineSpacingInPixels: lineSpacingInPixels,
-	})); err != nil {
-		log.Fatal(err)
-	}
-}

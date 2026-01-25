@@ -35,7 +35,7 @@ type Game struct {
 	screenHeight   int
 	tileMap        *ui.TileMap
 	debugOverlay   *ui.DebugOverlay
-	interactions   *InteractionManager
+	interactions   *ui.InteractionManager
 	lastClickedObj string
 }
 
@@ -63,7 +63,7 @@ func NewGame(cfg GameConfig) *Game {
 	debugOverlay := ui.NewDebugOverlay(0, 0)
 
 	// Create interaction manager
-	interactions := NewInteractionManager(tileSize)
+	interactions := ui.NewInteractionManager(tileSize)
 	
 	g := &Game{
 		screenWidth:  cfg.ScreenWidth,
@@ -80,23 +80,23 @@ func NewGame(cfg GameConfig) *Game {
 	})
 	
 	// Add interactive objects
-	interactions.AddObject(InteractiveObject{
+	interactions.AddObject(ui.InteractiveObject{
 		Name:   "House",
 		Bounds: image.Rect(5, 1, 11, 6),
 	})
-	interactions.AddObject(InteractiveObject{
+	interactions.AddObject(ui.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(5, 6, 6, 7), // Left flower
 	})
-	interactions.AddObject(InteractiveObject{
+	interactions.AddObject(ui.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(6, 6, 7, 7), // Second flower
 	})
-	interactions.AddObject(InteractiveObject{
+	interactions.AddObject(ui.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(9, 6, 10, 7), // Third flower
 	})
-	interactions.AddObject(InteractiveObject{
+	interactions.AddObject(ui.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(10, 6, 11, 7), // Right flower
 	})

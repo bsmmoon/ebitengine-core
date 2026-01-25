@@ -21,7 +21,6 @@ import (
 	"github.com/bsmmoon/ebitengine-core/internal/ui"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const (
@@ -32,12 +31,12 @@ const (
 
 // Game implements ebiten.Game interface for the tiles demo.
 type Game struct {
-	screenWidth  int
-	screenHeight int
-	tileMap      *ui.TileMap
-	debugOverlay *ui.DebugOverlay
-	houseRect    image.Rectangle
-	clickMessage string
+	screenWidth    int
+	screenHeight   int
+	tileMap        *ui.TileMap
+	debugOverlay   *ui.DebugOverlay
+	interactions   *ui.InteractionManager
+	lastClickedObj string
 }
 
 // NewGame creates a new tiles game with the given configuration.
@@ -63,38 +62,51 @@ func NewGame(cfg GameConfig) *Game {
 	// Create debug overlay at top-left
 	debugOverlay := ui.NewDebugOverlay(0, 0)
 
-	// Define house clickable area (in tile coordinates)
-	houseRect := image.Rect(5, 1, 11, 6)
-
-	return &Game{
+	// Create interaction manager
+	interactions := ui.NewInteractionManager(tileSize)
+	
+	g := &Game{
 		screenWidth:  cfg.ScreenWidth,
 		screenHeight: cfg.ScreenHeight,
 		tileMap:      tileMap,
 		debugOverlay: debugOverlay,
-		houseRect:    houseRect,
+		interactions: interactions,
 	}
+	
+	// Set interaction callback
+	interactions.SetOnInteraction(func(name string, tileX, tileY int) {
+		log.Printf("%s clicked at tile: (%d, %d)", name, tileX, tileY)
+		g.lastClickedObj = name + " clicked!"
+	})
+	
+	// Add interactive objects
+	interactions.AddObject(ui.InteractiveObject{
+		Name:   "House",
+		Bounds: image.Rect(5, 1, 11, 6),
+	})
+	interactions.AddObject(ui.InteractiveObject{
+		Name:   "Flower",
+		Bounds: image.Rect(5, 6, 6, 7), // Left flower
+	})
+	interactions.AddObject(ui.InteractiveObject{
+		Name:   "Flower",
+		Bounds: image.Rect(6, 6, 7, 7), // Second flower
+	})
+	interactions.AddObject(ui.InteractiveObject{
+		Name:   "Flower",
+		Bounds: image.Rect(9, 6, 10, 7), // Third flower
+	})
+	interactions.AddObject(ui.InteractiveObject{
+		Name:   "Flower",
+		Bounds: image.Rect(10, 6, 11, 7), // Right flower
+	})
+
+	return g
 }
 
 // Update implements ebiten.Game interface.
 func (g *Game) Update() error {
-	// Check for mouse click
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		// Get mouse position
-		mouseX, mouseY := ebiten.CursorPosition()
-		
-		// Convert to tile coordinates
-		tileX := mouseX / tileSize
-		tileY := mouseY / tileSize
-		
-		// Check if clicked on house
-		if g.houseRect.Min.X <= tileX && tileX < g.houseRect.Max.X &&
-			g.houseRect.Min.Y <= tileY && tileY < g.houseRect.Max.Y {
-			g.clickMessage = "House clicked!"
-			log.Println("House clicked at tile:", tileX, tileY)
-		} else {
-			g.clickMessage = ""
-		}
-	}
+	g.interactions.Update()
 	return nil
 }
 
@@ -103,9 +115,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.tileMap.Draw(screen)
 	g.debugOverlay.Draw(screen)
 	
-	// Show click message if house was clicked
-	if g.clickMessage != "" {
-		g.debugOverlay.DrawMessage(screen, g.clickMessage, 0, 20)
+	// Show last clicked object message
+	if g.lastClickedObj != "" {
+		g.debugOverlay.DrawMessage(screen, g.lastClickedObj, 0, 20)
 	}
 }
 

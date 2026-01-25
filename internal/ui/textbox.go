@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package ui
 
 import (
 	"image"
@@ -45,7 +45,7 @@ func (t *TextBox) AppendLine(line string) {
 	}
 }
 
-func (t *TextBox) Update(ctx *GameContext) {
+func (t *TextBox) Update(ctx *Context) {
 	if t.vScrollBar == nil {
 		t.vScrollBar = &VScrollBar{}
 	}
@@ -60,7 +60,7 @@ func (t *TextBox) Update(ctx *GameContext) {
 	t.offsetY = t.vScrollBar.ContentOffset()
 }
 
-func (t *TextBox) contentSize(ctx *GameContext) (int, int) {
+func (t *TextBox) contentSize(ctx *Context) (int, int) {
 	h := int(float64(len(strings.Split(t.Text, "\n")))*ctx.lineSpacingInPixels) + textBoxPaddingTop
 	return t.Rect.Dx(), h
 }
@@ -73,7 +73,7 @@ func (t *TextBox) contentOffset() (int, int) {
 	return t.offsetX, t.offsetY
 }
 
-func (t *TextBox) Draw(dst *ebiten.Image, ctx *GameContext) {
+func (t *TextBox) Draw(dst *ebiten.Image, ctx *Context) {
 	ctx.drawNinePatches(dst, t.Rect, imageTypeTextBox)
 
 	textOp := &text.DrawOptions{}

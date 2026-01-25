@@ -8,7 +8,7 @@ import (
 
 // TestLayout ensures the game reports its intended screen size.
 func TestLayout(t *testing.T) {
-	g := &Game{}
+	g := NewGame()
 	w, h := g.Layout(800, 600)
 	if w != 320 || h != 240 {
 		t.Errorf("expected (320,240), got (%d,%d)", w, h)
@@ -17,7 +17,7 @@ func TestLayout(t *testing.T) {
 
 // TestUpdate ensures Update returns no error.
 func TestUpdate(t *testing.T) {
-	g := &Game{}
+	g := NewGame()
 	if err := g.Update(); err != nil {
 		t.Errorf("expected no error, got %v", err)
 	}
@@ -25,7 +25,7 @@ func TestUpdate(t *testing.T) {
 
 // TestDraw runs Draw with an offscreen image to ensure no panic.
 func TestDraw(t *testing.T) {
-	g := &Game{}
+	g := NewGame()
 	img := ebiten.NewImage(320, 240)
 	// If Draw panics, the test will fail.
 	g.Draw(img)

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package ui
 
 import (
 	"image"
@@ -39,7 +39,7 @@ type CheckBox struct {
 	onCheckChanged func(c *CheckBox)
 }
 
-func (c *CheckBox) width(ctx *GameContext) int {
+func (c *CheckBox) width(ctx *Context) int {
 	w := text.Advance(c.Text, &text.GoTextFace{
 		Source: ctx.uiFaceSource,
 		Size:   ctx.uiFontSize,
@@ -47,7 +47,7 @@ func (c *CheckBox) width(ctx *GameContext) int {
 	return checkboxWidth + checkboxPaddingLeft + int(w)
 }
 
-func (c *CheckBox) Update(ctx *GameContext) {
+func (c *CheckBox) Update(ctx *Context) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
 		if c.X <= x && x < c.X+c.width(ctx) && c.Y <= y && y < c.Y+checkboxHeight {
@@ -66,7 +66,7 @@ func (c *CheckBox) Update(ctx *GameContext) {
 	}
 }
 
-func (c *CheckBox) Draw(dst *ebiten.Image, ctx *GameContext) {
+func (c *CheckBox) Draw(dst *ebiten.Image, ctx *Context) {
 	t := imageTypeCheckBox
 	if c.mouseDown {
 		t = imageTypeCheckBoxPressed

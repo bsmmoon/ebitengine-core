@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package ui
 
-type GameConfig struct {
-	ScreenWidth         int
-	ScreenHeight        int
-	UIFontSize          float64
-	LineSpacingInPixels float64
+type Input struct {
+	mouseButtonState int
 }

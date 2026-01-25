@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package ui
 
 import (
 	"image"
@@ -49,7 +49,7 @@ func (b *Button) Update() {
 	}
 }
 
-func (b *Button) Draw(dst *ebiten.Image, ctx *GameContext) {
+func (b *Button) Draw(dst *ebiten.Image, ctx *Context) {
 	t := imageTypeButton
 	if b.mouseDown {
 		t = imageTypeButtonPressed

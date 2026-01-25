@@ -29,6 +29,24 @@ internal/               # Reusable components
   └── example_ui/       # Example UI game implementation
 ```
 
+## Architecture
+
+**Package Structure:**
+- `cmd/` - Thin entry points that configure and run games
+- `internal/ui/` - Reusable UI widgets (shared across games)
+- `internal/{game_name}/` - Game-specific logic (one package per game)
+
+**Interface Pattern:**
+Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
+- `Update() error` - Game logic per frame
+- `Draw(screen *ebiten.Image)` - Rendering per frame
+- `Layout(w, h int) (int, int)` - Screen dimensions
+
+**Separation of Concerns:**
+- UI widgets are stateless and reusable
+- Game structs own their state and widget instances
+- Main functions handle window setup and game initialization
+
 ## AI Assistant Reference
 
 > This section helps AI assistants efficiently navigate the codebase by providing direct file paths and their purposes, minimizing token usage from exploratory file reads.

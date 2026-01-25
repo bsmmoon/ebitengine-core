@@ -12,55 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package example_ui
 
 import (
 	"image"
 	"image/color"
 
+	"github.com/bsmmoon/ebitengine-core/internal/ui"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	uiContext    *GameContext
+	uiContext    *ui.Context
 	screenWidth  int
 	screenHeight int
-	button1      *Button
-	button2      *Button
-	checkBox     *CheckBox
-	textBoxLog   *TextBox
+	button1      *ui.Button
+	button2      *ui.Button
+	checkBox     *ui.CheckBox
+	textBoxLog   *ui.TextBox
 }
 
 func NewGame(cfg GameConfig) *Game {
 	g := &Game{
-		uiContext:    NewGameContext(cfg.UIFontSize, cfg.LineSpacingInPixels),
+		uiContext:    ui.NewContext(cfg.UIFontSize, cfg.LineSpacingInPixels),
 		screenWidth:  cfg.ScreenWidth,
 		screenHeight: cfg.ScreenHeight,
 	}
-	g.button1 = &Button{
+	g.button1 = &ui.Button{
 		Rect: image.Rect(16, 16, 144, 48),
 		Text: "Button 1",
 	}
-	g.button2 = &Button{
+	g.button2 = &ui.Button{
 		Rect: image.Rect(160, 16, 288, 48),
 		Text: "Button 2",
 	}
-	g.checkBox = &CheckBox{
+	g.checkBox = &ui.CheckBox{
 		X:    16,
 		Y:    64,
 		Text: "Check Box!",
 	}
-	g.textBoxLog = &TextBox{
+	g.textBoxLog = &ui.TextBox{
 		Rect: image.Rect(16, 96, 624, 464),
 	}
 
-	g.button1.SetOnPressed(func(b *Button) {
+	g.button1.SetOnPressed(func(b *ui.Button) {
 		g.textBoxLog.AppendLine("Button 1 Pressed")
 	})
-	g.button2.SetOnPressed(func(b *Button) {
+	g.button2.SetOnPressed(func(b *ui.Button) {
 		g.textBoxLog.AppendLine("Button 2 Pressed")
 	})
-	g.checkBox.SetOnCheckChanged(func(c *CheckBox) {
+	g.checkBox.SetOnCheckChanged(func(c *ui.CheckBox) {
 		msg := "Check box check changed"
 		if c.Checked() {
 			msg += " (Checked)"

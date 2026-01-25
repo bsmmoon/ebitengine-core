@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package ui
 
 import (
 	"bytes"
@@ -27,14 +27,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
 )
 
-type GameContext struct {
+type Context struct {
 	uiImage             *ebiten.Image
 	uiFaceSource        *text.GoTextFaceSource
 	uiFontSize          float64
 	lineSpacingInPixels float64
 }
 
-func NewGameContext(uiFontSize, lineSpacingInPixels float64) *GameContext {
+func NewContext(uiFontSize, lineSpacingInPixels float64) *Context {
 	img, _, err := image.Decode(bytes.NewReader(images.UI_png))
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +46,7 @@ func NewGameContext(uiFontSize, lineSpacingInPixels float64) *GameContext {
 		log.Fatal(err)
 	}
 
-	return &GameContext{
+	return &Context{
 		uiImage:             uiImage,
 		uiFaceSource:        s,
 		uiFontSize:          uiFontSize,
@@ -78,7 +78,7 @@ var imageSrcRects = map[imageType]image.Rectangle{
 	imageTypeCheckBoxMark:    image.Rect(32, 32, 48, 48),
 }
 
-func (c *GameContext) drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, t imageType) {
+func (c *Context) drawNinePatches(dst *ebiten.Image, dstRect image.Rectangle, t imageType) {
 	srcRect := imageSrcRects[t]
 	srcX := srcRect.Min.X
 	srcY := srcRect.Min.Y

@@ -17,14 +17,14 @@ package main
 import (
 	"log"
 
-	"github.com/bsmmoon/ebitengine-core/internal/game"
+	"github.com/bsmmoon/ebitengine-core/internal/example_ui"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("UI (Ebitengine Demo)")
-	if err := ebiten.RunGame(game.NewGame(game.GameConfig{
+	if err := ebiten.RunGame(example_ui.NewGame(example_ui.GameConfig{
 		ScreenWidth:         screenWidth,
 		ScreenHeight:        screenHeight,
 		UIFontSize:          uiFontSize,

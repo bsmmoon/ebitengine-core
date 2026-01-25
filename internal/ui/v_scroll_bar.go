@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package game
+package ui
 
 import (
 	"image"
@@ -100,7 +100,7 @@ func (v *VScrollBar) Update(contentHeight int) {
 	}
 }
 
-func (v *VScrollBar) Draw(dst *ebiten.Image, ctx *GameContext) {
+func (v *VScrollBar) Draw(dst *ebiten.Image, ctx *Context) {
 	sd := image.Rect(v.X, v.Y, v.X+VScrollBarWidth, v.Y+v.Height)
 	ctx.drawNinePatches(dst, sd, imageTypeVScrollBarBack)
 

@@ -25,5 +25,30 @@ cmd/                    # Executable entry points
   └── example_ui/       # UI widgets demo
 internal/               # Reusable components
   ├── helloworld/       # Hello world logic
-  └── game/             # UI widgets (Button, CheckBox, TextBox, VScrollBar)
+  ├── ui/               # UI widgets (Button, CheckBox, TextBox, VScrollBar)
+  └── example_ui/       # Example UI game implementation
 ```
+
+## AI Assistant Reference
+
+> This section helps AI assistants efficiently navigate the codebase by providing direct file paths and their purposes, minimizing token usage from exploratory file reads.
+
+**Entry Points:**
+- `cmd/helloworld/main.go` - Minimal game example
+- `cmd/example_ui/main.go` - UI demo with widgets
+
+**Core Game Logic:**
+- `internal/example_ui/game.go` - Example UI game loop (Update/Draw/Layout)
+- `internal/example_ui/game_config.go` - Game configuration
+
+**UI Components:**
+- `internal/ui/context.go` - UI state management
+- `internal/ui/button.go` - Clickable button widget
+- `internal/ui/check_box.go` - Checkbox with toggle
+- `internal/ui/textbox.go` - Scrollable text display
+- `internal/ui/v_scroll_bar.go` - Vertical scrollbar
+- `internal/ui/input.go` - Input handling
+
+**Configuration:**
+- `go.mod` - Dependencies (Ebitengine v2.8.8)
+- `cmd/example_ui/config.go` - Screen/UI settings

@@ -2,7 +2,6 @@ package tiles
 
 import (
 	"image"
-	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -50,12 +49,12 @@ func (im *InteractionManager) Update() {
 		for _, obj := range im.objects {
 			if obj.Bounds.Min.X <= tileX && tileX < obj.Bounds.Max.X &&
 				obj.Bounds.Min.Y <= tileY && tileY < obj.Bounds.Max.Y {
-				
+
 				// Call global interaction callback if set
 				if im.onInteraction != nil {
 					im.onInteraction(obj.Name, tileX, tileY)
 				}
-				
+
 				// Call object-specific callback if set
 				if obj.OnClick != nil {
 					obj.OnClick()
@@ -65,4 +64,3 @@ func (im *InteractionManager) Update() {
 		}
 	}
 }
-

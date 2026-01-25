@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package tiles
 
-import (
-	"log"
-
-	"github.com/bsmmoon/ebitengine-core/internal/tiles"
-	"github.com/hajimehoshi/ebiten/v2"
-)
-
-func main() {
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
-	ebiten.SetWindowTitle("Tiles (Ebitengine Demo)")
-	if err := ebiten.RunGame(tiles.NewGame(tiles.GameConfig{
-		ScreenWidth:  screenWidth,
-		ScreenHeight: screenHeight,
-	})); err != nil {
-		log.Fatal(err)
-	}
+// GameConfig holds configuration for the tiles game.
+type GameConfig struct {
+	ScreenWidth  int
+	ScreenHeight int
 }

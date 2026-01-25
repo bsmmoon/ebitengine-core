@@ -15,11 +15,13 @@
 package tiles
 
 import (
+	"image"
 	"log"
 
 	"github.com/bsmmoon/ebitengine-core/internal/ui"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const (
@@ -34,6 +36,8 @@ type Game struct {
 	screenHeight int
 	tileMap      *ui.TileMap
 	debugOverlay *ui.DebugOverlay
+	houseRect    image.Rectangle
+	clickMessage string
 }
 
 // NewGame creates a new tiles game with the given configuration.
@@ -59,16 +63,38 @@ func NewGame(cfg GameConfig) *Game {
 	// Create debug overlay at top-left
 	debugOverlay := ui.NewDebugOverlay(0, 0)
 
+	// Define house clickable area (in tile coordinates)
+	houseRect := image.Rect(5, 1, 11, 6)
+
 	return &Game{
 		screenWidth:  cfg.ScreenWidth,
 		screenHeight: cfg.ScreenHeight,
 		tileMap:      tileMap,
 		debugOverlay: debugOverlay,
+		houseRect:    houseRect,
 	}
 }
 
 // Update implements ebiten.Game interface.
 func (g *Game) Update() error {
+	// Check for mouse click
+	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+		// Get mouse position
+		mouseX, mouseY := ebiten.CursorPosition()
+		
+		// Convert to tile coordinates
+		tileX := mouseX / tileSize
+		tileY := mouseY / tileSize
+		
+		// Check if clicked on house
+		if g.houseRect.Min.X <= tileX && tileX < g.houseRect.Max.X &&
+			g.houseRect.Min.Y <= tileY && tileY < g.houseRect.Max.Y {
+			g.clickMessage = "House clicked!"
+			log.Println("House clicked at tile:", tileX, tileY)
+		} else {
+			g.clickMessage = ""
+		}
+	}
 	return nil
 }
 
@@ -76,6 +102,11 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.tileMap.Draw(screen)
 	g.debugOverlay.Draw(screen)
+	
+	// Show click message if house was clicked
+	if g.clickMessage != "" {
+		g.debugOverlay.DrawMessage(screen, g.clickMessage, 0, 20)
+	}
 }
 
 // Layout implements ebiten.Game interface.

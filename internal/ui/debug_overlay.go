@@ -55,3 +55,11 @@ func (d *DebugOverlay) SetVisible(visible bool) {
 func (d *DebugOverlay) Toggle() {
 	d.Visible = !d.Visible
 }
+
+// DrawMessage renders a custom message at the specified offset from the overlay position.
+func (d *DebugOverlay) DrawMessage(dst *ebiten.Image, msg string, offsetX, offsetY int) {
+	if !d.Visible {
+		return
+	}
+	ebitenutil.DebugPrintAt(dst, msg, d.X+offsetX, d.Y+offsetY)
+}

@@ -77,6 +77,6 @@ Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
 - `internal/ui/image_utils.go` - Image loading and Spritesheet utilities
 
 **Configuration:**
-- `go.mod` - Dependencies (Ebitengine v2.8.8)
+- `go.mod` - Dependencies (Ebitengine v2.9.7)
 - `cmd/example_ui/config.go` - Screen/UI settings
 - `cmd/tiles/config.go` - Tiles screen settings

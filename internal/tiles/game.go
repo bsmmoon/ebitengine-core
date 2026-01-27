@@ -18,7 +18,7 @@ import (
 	"image"
 	"log"
 
-	"github.com/bsmmoon/ebitengine-core/internal/ui"
+	"github.com/bsmmoon/ebitengine-core/internal/shared"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 )
@@ -33,25 +33,25 @@ const (
 type Game struct {
 	screenWidth    int
 	screenHeight   int
-	tileMap        *ui.TileMap
-	debugOverlay   *ui.DebugOverlay
-	interactions   *ui.InteractionManager
+	tileMap        *shared.TileMap
+	debugOverlay   *shared.DebugOverlay
+	interactions   *shared.InteractionManager
 	lastClickedObj string
 }
 
 // NewGame creates a new tiles game with the given configuration.
 func NewGame(cfg GameConfig) *Game {
 	// Load the tiles spritesheet
-	tilesImage, err := ui.LoadImageFromBytes(images.Tiles_png)
+	tilesImage, err := shared.LoadImageFromBytes(images.Tiles_png)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Create spritesheet from the loaded image
-	spritesheet := ui.NewSpritesheet(tilesImage, tileSize)
+	spritesheet := shared.NewSpritesheet(tilesImage, tileSize)
 
 	// Create tilemap with the spritesheet
-	tileMap := ui.NewTileMap(spritesheet, mapWidth)
+	tileMap := shared.NewTileMap(spritesheet, mapWidth)
 
 	// Add background layer (grass with decorations)
 	tileMap.AddLayer(parseCSVLayer(backgroundLayerData))
@@ -60,10 +60,10 @@ func NewGame(cfg GameConfig) *Game {
 	tileMap.AddLayer(parseCSVLayer(foregroundLayerData))
 
 	// Create debug overlay at top-left
-	debugOverlay := ui.NewDebugOverlay(0, 0)
+	debugOverlay := shared.NewDebugOverlay(0, 0)
 
 	// Create interaction manager
-	interactions := ui.NewInteractionManager(tileSize)
+	interactions := shared.NewInteractionManager(tileSize)
 	
 	g := &Game{
 		screenWidth:  cfg.ScreenWidth,
@@ -80,23 +80,23 @@ func NewGame(cfg GameConfig) *Game {
 	})
 	
 	// Add interactive objects
-	interactions.AddObject(ui.InteractiveObject{
+	interactions.AddObject(shared.InteractiveObject{
 		Name:   "House",
 		Bounds: image.Rect(5, 1, 11, 6),
 	})
-	interactions.AddObject(ui.InteractiveObject{
+	interactions.AddObject(shared.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(5, 6, 6, 7), // Left flower
 	})
-	interactions.AddObject(ui.InteractiveObject{
+	interactions.AddObject(shared.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(6, 6, 7, 7), // Second flower
 	})
-	interactions.AddObject(ui.InteractiveObject{
+	interactions.AddObject(shared.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(9, 6, 10, 7), // Third flower
 	})
-	interactions.AddObject(ui.InteractiveObject{
+	interactions.AddObject(shared.InteractiveObject{
 		Name:   "Flower",
 		Bounds: image.Rect(10, 6, 11, 7), // Right flower
 	})

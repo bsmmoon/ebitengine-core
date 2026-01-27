@@ -17,6 +17,7 @@ The goal of this repository is to provide a "core" minimal ebitengine project re
 - **helloworld** - Minimal example displaying "Hello, World!"
 - **example_ui** - Interactive UI with buttons, checkboxes, and text boxes
 - **tiles** - Tilemap rendering demo with layered tiles and debug overlay
+- **font** - Text rendering demo with custom fonts and Japanese Kanji
 
 ## Project Structure
 
@@ -24,20 +25,22 @@ The goal of this repository is to provide a "core" minimal ebitengine project re
 cmd/                    # Executable entry points
   ├── helloworld/       # Basic demo
   ├── example_ui/       # UI widgets demo
-  └── tiles/            # Tilemap demo
+  ├── tiles/            # Tilemap demo
+  └── font/             # Font rendering demo
 internal/               # Reusable components
   ├── helloworld/       # Hello world logic
-  ├── ui/               # UI widgets and utilities
-  ├── example_ui/       # Example UI game implementation
-  └── tiles/            # Tiles game implementation
+  ├── shared/           # Shared utilities (InteractionManager, DebugOverlay, TileMap)
+  ├── example_ui/       # Example UI game + widgets (Button, CheckBox, TextBox)
+  ├── tiles/            # Tiles game implementation
+  └── font/             # Font demo implementation
 ```
 
 ## Architecture
 
 **Package Structure:**
 - `cmd/` - Thin entry points that configure and run games
-- `internal/ui/` - Reusable UI widgets and utilities (shared across games)
-- `internal/{game_name}/` - Game-specific logic (one package per game)
+- `internal/shared/` - Cross-game utilities (InteractionManager, DebugOverlay, TileMap, image utilities)
+- `internal/{game_name}/` - Game-specific logic and widgets (one package per game)
 
 **Interface Pattern:**
 Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
@@ -46,7 +49,8 @@ Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
 - `Layout(w, h int) (int, int)` - Screen dimensions
 
 **Separation of Concerns:**
-- UI widgets are stateless and reusable
+- Shared utilities in `internal/shared/` are truly reusable across games
+- Game-specific widgets stay with their games (e.g., Button/CheckBox in `internal/example_ui/`)
 - Game structs own their state and widget instances
 - Main functions handle window setup and game initialization
 
@@ -55,28 +59,18 @@ Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
 > This section helps AI assistants efficiently navigate the codebase by providing direct file paths and their purposes, minimizing token usage from exploratory file reads.
 
 **Entry Points:**
-- `cmd/helloworld/main.go` - Minimal game example
-- `cmd/example_ui/main.go` - UI demo with widgets
-- `cmd/tiles/main.go` - Tilemap rendering demo
-
-**Core Game Logic:**
-- `internal/example_ui/game.go` - Example UI game loop (Update/Draw/Layout)
-- `internal/example_ui/game_config.go` - Game configuration
-- `internal/tiles/game.go` - Tiles game loop with TileMap and DebugOverlay
-- `internal/tiles/game_config.go` - Tiles game configuration
-
-**UI Components:**
-- `internal/ui/context.go` - UI state management
-- `internal/ui/button.go` - Clickable button widget
-- `internal/ui/check_box.go` - Checkbox with toggle
-- `internal/ui/textbox.go` - Scrollable text display
-- `internal/ui/v_scroll_bar.go` - Vertical scrollbar
-- `internal/ui/input.go` - Input handling
-- `internal/ui/tilemap.go` - TileMap component for layered tile rendering
-- `internal/ui/debug_overlay.go` - TPS/FPS debug display widget
-- `internal/ui/image_utils.go` - Image loading and Spritesheet utilities
+- `cmd/{game_name}/main.go` - Each game has a thin main.go that configures and runs the game
 
 **Configuration:**
-- `go.mod` - Dependencies (Ebitengine v2.9.7)
-- `cmd/example_ui/config.go` - Screen/UI settings
-- `cmd/tiles/config.go` - Tiles screen settings
+- `go.mod` - Dependencies (Ebitengine v2.8.8)
+- `cmd/{game_name}/config.go` - Game-specific screen and configuration settings
+
+**Core Game Logic:**
+- `internal/{game_name}/game.go` - Game loop implementation (Update/Draw/Layout)
+- `internal/{game_name}/game_config.go` - Game configuration struct
+
+**Shared Components:**
+- `internal/shared/interaction.go` - InteractionManager for rectangular click detection (works with tile-based or pixel-based coordinates)
+- `internal/shared/debug_overlay.go` - TPS/FPS debug display widget
+- `internal/shared/tilemap.go` - TileMap component for layered tile rendering
+- `internal/shared/image_utils.go` - Image loading and Spritesheet utilities

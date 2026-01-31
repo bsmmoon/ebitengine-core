@@ -1,4 +1,4 @@
-// Copyright 2015 Hajime Hoshi
+// Copyright 2018 The Ebiten Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,7 @@
 
 package main
 
-import (
-	"log"
-
-	"github.com/bsmmoon/ebitengine-core/internal/sprites"
-	"github.com/hajimehoshi/ebiten/v2"
+const (
+	screenWidth  = 640
+	screenHeight = 480
 )
-
-func main() {
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle("Sprites (Ebitengine Demo)")
-	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	if err := ebiten.RunGame(sprites.NewGame(sprites.GameConfig{
-		ScreenWidth:  screenWidth,
-		ScreenHeight: screenHeight,
-	})); err != nil {
-		log.Fatal(err)
-	}
-}

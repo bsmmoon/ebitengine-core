@@ -28,32 +28,45 @@ const (
 	screenWidth  = 320
 	screenHeight = 240
 
-	frameOX     = 0
-	frameOY     = 32
+	// frameOX and frameOY are the origin (top-left corner) of the animation sequence in the spritesheet.
+	frameOX = 0
+	frameOY = 32
+	// frameWidth and frameHeight are the dimensions of a single frame.
 	frameWidth  = 32
 	frameHeight = 32
-	frameCount  = 8
+	// frameCount is the total number of frames in the animation sequence.
+	frameCount = 8
 )
 
 var (
+	// runnerImage stores the loaded spritesheet image.
 	runnerImage *ebiten.Image
 )
 
 type Game struct {
+	// count is used to track the elapsed time (in ticks) for animation timing.
 	count int
 }
 
 func (g *Game) Update() error {
+	// Update the tick counter.
 	g.count++
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	op := &ebiten.DrawImageOptions{}
+	// Move the image's origin to its center so we can position it by its center.
 	op.GeoM.Translate(-float64(frameWidth)/2, -float64(frameHeight)/2)
+	// Move the image to the center of the screen.
 	op.GeoM.Translate(screenWidth/2, screenHeight/2)
+
+	// Calculate the current frame index based on the game tick count.
+	// Dividing by 5 slows down the animation (updates every 5 ticks).
 	i := (g.count / 5) % frameCount
 	sx, sy := frameOX+i*frameWidth, frameOY
+
+	// Extract the sub-image corresponding to the current frame from the spritesheet.
 	screen.DrawImage(runnerImage.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image), op)
 }
 

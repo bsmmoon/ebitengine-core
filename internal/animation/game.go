@@ -15,69 +15,47 @@
 package animation
 
 import (
-	"bytes"
-	"image"
-	_ "image/png"
 	"log"
 
+	"github.com/bsmmoon/ebitengine-core/internal/shared"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
 )
 
-const (
-	// frameOX and frameOY are the origin (top-left corner) of the animation sequence in the spritesheet.
-	frameOX = 0
-	frameOY = 32
-	// frameWidth and frameHeight are the dimensions of a single frame.
-	frameWidth  = 32
-	frameHeight = 32
-	// frameCount is the total number of frames in the animation sequence.
-	frameCount = 8
-)
-
 type Game struct {
-	// count is used to track the elapsed time (in ticks) for animation timing.
-	count        int
 	screenWidth  int
 	screenHeight int
-	runnerImage  *ebiten.Image
+	runnerSprite *shared.Sprite
 }
 
 func NewGame(cfg GameConfig) *Game {
-	// Decode an image from the image file's byte slice.
-	img, _, err := image.Decode(bytes.NewReader(images.Runner_png))
+	// Use shared utility to load image
+	img, err := shared.LoadImageFromBytes(images.Runner_png)
 	if err != nil {
 		log.Fatal(err)
 	}
-	runnerImage := ebiten.NewImageFromImage(img)
+
+	// Create a new sprite: 32x32 frames, starting at (0, 32), 8 frames, speed 5
+	sprite := shared.NewSprite(img, 32, 32, 0, 32, 8, 5)
 
 	return &Game{
 		screenWidth:  cfg.ScreenWidth,
 		screenHeight: cfg.ScreenHeight,
-		runnerImage:  runnerImage,
+		runnerSprite: sprite,
 	}
 }
 
 func (g *Game) Update() error {
-	// Update the tick counter.
-	g.count++
+	g.runnerSprite.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	op := &ebiten.DrawImageOptions{}
-	// Move the image's origin to its center so we can position it by its center.
-	op.GeoM.Translate(-float64(frameWidth)/2, -float64(frameHeight)/2)
-	// Move the image to the center of the screen.
-	op.GeoM.Translate(float64(g.screenWidth)/2, float64(g.screenHeight)/2)
-
-	// Calculate the current frame index based on the game tick count.
-	// Dividing by 5 slows down the animation (updates every 5 ticks).
-	i := (g.count / 5) % frameCount
-	sx, sy := frameOX+i*frameWidth, frameOY
-
-	// Extract the sub-image corresponding to the current frame from the spritesheet.
-	screen.DrawImage(g.runnerImage.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image), op)
+	w, h := g.runnerSprite.Size()
+	// Center the sprite on the screen
+	x := float64(g.screenWidth)/2 - float64(w)/2
+	y := float64(g.screenHeight)/2 - float64(h)/2
+	g.runnerSprite.Draw(screen, x, y)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

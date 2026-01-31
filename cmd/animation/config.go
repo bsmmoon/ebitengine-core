@@ -14,20 +14,7 @@
 
 package main
 
-import (
-	"log"
-
-	"github.com/bsmmoon/ebitengine-core/internal/animation"
-	"github.com/hajimehoshi/ebiten/v2"
+const (
+	screenWidth  = 320
+	screenHeight = 240
 )
-
-func main() {
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
-	ebiten.SetWindowTitle("Animation (Ebitengine Demo)")
-	if err := ebiten.RunGame(animation.NewGame(animation.GameConfig{
-		ScreenWidth:  screenWidth,
-		ScreenHeight: screenHeight,
-	})); err != nil {
-		log.Fatal(err)
-	}
-}

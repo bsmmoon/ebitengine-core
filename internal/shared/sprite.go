@@ -30,6 +30,7 @@ type Sprite struct {
 	frameCount  int
 	speed       int // Ticks per frame
 	tick        int
+	FlipH       bool
 }
 
 // NewSprite creates a new animated sprite.
@@ -53,6 +54,10 @@ func (s *Sprite) Update() {
 // Draw renders the current frame of the sprite at the given position.
 func (s *Sprite) Draw(screen *ebiten.Image, x, y float64) {
 	op := &ebiten.DrawImageOptions{}
+	if s.FlipH {
+		op.GeoM.Scale(-1, 1)
+		op.GeoM.Translate(float64(s.frameWidth), 0)
+	}
 	op.GeoM.Translate(x, y)
 
 	// Calculate current frame index

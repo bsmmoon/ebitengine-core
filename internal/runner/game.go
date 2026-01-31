@@ -23,9 +23,11 @@ import (
 )
 
 type Game struct {
-	screenWidth  int
-	screenHeight int
-	runnerSprite *shared.Sprite
+	screenWidth    int
+	screenHeight   int
+	standingSprite *shared.Sprite
+	runningSprite  *shared.Sprite
+	activeSprite   *shared.Sprite
 }
 
 func NewGame(cfg GameConfig) *Game {
@@ -35,27 +37,47 @@ func NewGame(cfg GameConfig) *Game {
 		log.Fatal(err)
 	}
 
-	// Create a new sprite: 32x32 frames, starting at (0, 32), 8 frames, speed 5
-	sprite := shared.NewSprite(img, 32, 32, 0, 32, 8, 5)
+	standingSprite := shared.NewSprite(img, 32, 32, 0, 0, 5, 5) // standing
+	runningSprite := shared.NewSprite(img, 32, 32, 0, 32, 8, 5) // running
 
 	return &Game{
-		screenWidth:  cfg.ScreenWidth,
-		screenHeight: cfg.ScreenHeight,
-		runnerSprite: sprite,
+		screenWidth:    cfg.ScreenWidth,
+		screenHeight:   cfg.ScreenHeight,
+		standingSprite: standingSprite,
+		runningSprite:  runningSprite,
+		activeSprite:   standingSprite,
 	}
 }
 
 func (g *Game) Update() error {
-	g.runnerSprite.Update()
+	flipH := g.activeSprite.FlipH
+	moving := false
+
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		flipH = true
+		moving = true
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		flipH = false
+		moving = true
+	}
+
+	if moving {
+		g.activeSprite = g.runningSprite
+	} else {
+		g.activeSprite = g.standingSprite
+	}
+	g.activeSprite.FlipH = flipH
+	g.activeSprite.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	w, h := g.runnerSprite.Size()
+	w, h := g.activeSprite.Size()
 	// Center the sprite on the screen
 	x := float64(g.screenWidth)/2 - float64(w)/2
 	y := float64(g.screenHeight)/2 - float64(h)/2
-	g.runnerSprite.Draw(screen, x, y)
+	g.activeSprite.Draw(screen, x, y)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

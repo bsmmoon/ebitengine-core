@@ -106,7 +106,7 @@ func (g *Game) Update() error {
 			ctx.Text(fmt.Sprintf("TPS: %0.2f", ebiten.ActualTPS()))
 			ctx.Text(fmt.Sprintf("FPS: %0.2f", ebiten.ActualFPS()))
 			ctx.Slider(&g.sprites.num, MinSprites, MaxSprites, 100)
-			ctx.Checkbox("Use Goroutines", &g.useGoroutines)
+			ctx.Checkbox(&g.useGoroutines, "Use Goroutines")
 		})
 		return nil
 	}); err != nil {

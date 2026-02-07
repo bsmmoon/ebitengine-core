@@ -31,7 +31,9 @@ import (
 )
 
 const (
+	InitialCount = 500
 	MinSprites = 0
+	Threshold = 10000
 	MaxSprites = 100000
 )
 
@@ -74,7 +76,7 @@ func (g *Game) init() {
 	}()
 
 	g.sprites.sprites = make([]*Sprite, MaxSprites)
-	g.sprites.num = 500
+	g.sprites.num = InitialCount
 	g.drawOps = make([]ebiten.DrawImageOptions, MaxSprites)
 	for i := range g.sprites.sprites {
 		w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
@@ -113,31 +115,43 @@ func (g *Game) Update() error {
 	g.sprites.Update(g.screenWidth, g.screenHeight)
 
 	w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
-	workers := runtime.NumCPU()
-	chunkSize := (g.sprites.num + workers - 1) / workers
 
-	var wg sync.WaitGroup
-	for worker := 0; worker < workers; worker++ {
-		start := worker * chunkSize
-		end := min(start+chunkSize, g.sprites.num)
-		if start >= g.sprites.num {
-			break
-		}
+	if g.sprites.num > Threshold {
+		workers := runtime.NumCPU()
+		chunkSize := (g.sprites.num + workers - 1) / workers
 
-		wg.Add(1)
-		go func(start, end int) {
-			defer wg.Done()
-			for i := start; i < end; i++ {
-				s := g.sprites.sprites[i]
-				g.drawOps[i].GeoM.Reset()
-				g.drawOps[i].GeoM.Translate(-float64(w)/2, -float64(h)/2)
-				g.drawOps[i].GeoM.Rotate(2 * math.Pi * float64(s.angle) / maxAngle)
-				g.drawOps[i].GeoM.Translate(float64(w)/2, float64(h)/2)
-				g.drawOps[i].GeoM.Translate(float64(s.x), float64(s.y))
+		var wg sync.WaitGroup
+		for worker := 0; worker < workers; worker++ {
+			start := worker * chunkSize
+			end := min(start+chunkSize, g.sprites.num)
+			if start >= g.sprites.num {
+				break
 			}
-		}(start, end)
+
+			wg.Add(1)
+			go func(start, end int) {
+				defer wg.Done()
+				for i := start; i < end; i++ {
+					s := g.sprites.sprites[i]
+					g.drawOps[i].GeoM.Reset()
+					g.drawOps[i].GeoM.Translate(-float64(w)/2, -float64(h)/2)
+					g.drawOps[i].GeoM.Rotate(2 * math.Pi * float64(s.angle) / maxAngle)
+					g.drawOps[i].GeoM.Translate(float64(w)/2, float64(h)/2)
+					g.drawOps[i].GeoM.Translate(float64(s.x), float64(s.y))
+				}
+			}(start, end)
+		}
+		wg.Wait()
+	} else {
+		for i := 0; i < g.sprites.num; i++ {
+			s := g.sprites.sprites[i]
+			g.drawOps[i].GeoM.Reset()
+			g.drawOps[i].GeoM.Translate(-float64(w)/2, -float64(h)/2)
+			g.drawOps[i].GeoM.Rotate(2 * math.Pi * float64(s.angle) / maxAngle)
+			g.drawOps[i].GeoM.Translate(float64(w)/2, float64(h)/2)
+			g.drawOps[i].GeoM.Translate(float64(s.x), float64(s.y))
+		}
 	}
-	wg.Wait()
 
 	return nil
 }

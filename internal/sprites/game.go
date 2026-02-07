@@ -118,6 +118,13 @@ func (g *Game) Update() error {
 	w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
 
 	if g.useGoroutines {
+		// Parallel processing: distribute sprite transformations across CPU cores.
+		// Uses worker pool pattern (NumCPU workers) instead of one goroutine per sprite.
+		// Why batch? Creating 200k goroutines every frame (60x/sec) would cause:
+		// - Memory overhead (each goroutine ~2KB stack)
+		// - Scheduler thrashing (Go runtime managing 200k goroutines)
+		// - Context switching overhead exceeding actual work
+		// Batching into CPU-count chunks keeps overhead low while maximizing parallelism.
 		workers := runtime.NumCPU()
 		chunkSize := (g.sprites.num + workers - 1) / workers
 
@@ -130,8 +137,11 @@ func (g *Game) Update() error {
 			}
 
 			wg.Add(1)
+			// Launch goroutine for this chunk. Captures start/end to avoid race conditions.
 			go func(start, end int) {
 				defer wg.Done()
+				// Each goroutine computes transformations for its assigned range.
+				// No shared state conflicts since each writes to different drawOps[i].
 				for i := start; i < end; i++ {
 					s := g.sprites.sprites[i]
 					g.drawOps[i].GeoM.Reset()
@@ -142,6 +152,7 @@ func (g *Game) Update() error {
 				}
 			}(start, end)
 		}
+		// Wait for all workers to complete before proceeding to Draw.
 		wg.Wait()
 	} else {
 		for i := 0; i < g.sprites.num; i++ {

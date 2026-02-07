@@ -32,19 +32,19 @@ import (
 
 const (
 	InitialCount = 500
-	MinSprites = 0
-	Threshold = 10000
-	MaxSprites = 100000
+	MinSprites   = 0
+	MaxSprites   = 100000
 )
 
 type Game struct {
-	debugui      debugui.DebugUI
-	sprites      Sprites
-	drawOps      []ebiten.DrawImageOptions
-	inited       bool
-	screenWidth  int
-	screenHeight int
-	ebitenImage  *ebiten.Image
+	debugui       debugui.DebugUI
+	sprites       Sprites
+	drawOps       []ebiten.DrawImageOptions
+	useGoroutines bool
+	inited        bool
+	screenWidth   int
+	screenHeight  int
+	ebitenImage   *ebiten.Image
 }
 
 func NewGame(cfg GameConfig) *Game {
@@ -102,10 +102,11 @@ func (g *Game) Update() error {
 
 	// Update the debug UI (allows changing the number of sprites).
 	if _, err := g.debugui.Update(func(ctx *debugui.Context) error {
-		ctx.Window("Sprites", image.Rect(10, 10, 210, 110), func(layout debugui.ContainerLayout) {
+		ctx.Window("Sprites", image.Rect(10, 10, 210, 140), func(layout debugui.ContainerLayout) {
 			ctx.Text(fmt.Sprintf("TPS: %0.2f", ebiten.ActualTPS()))
 			ctx.Text(fmt.Sprintf("FPS: %0.2f", ebiten.ActualFPS()))
 			ctx.Slider(&g.sprites.num, MinSprites, MaxSprites, 100)
+			ctx.Checkbox("Use Goroutines", &g.useGoroutines)
 		})
 		return nil
 	}); err != nil {
@@ -116,7 +117,7 @@ func (g *Game) Update() error {
 
 	w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
 
-	if g.sprites.num > Threshold {
+	if g.useGoroutines {
 		workers := runtime.NumCPU()
 		chunkSize := (g.sprites.num + workers - 1) / workers
 

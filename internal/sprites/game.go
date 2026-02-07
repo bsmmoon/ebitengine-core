@@ -22,8 +22,6 @@ import (
 	"log"
 	"math"
 	"math/rand/v2"
-	"runtime"
-	"sync"
 
 	"github.com/ebitengine/debugui"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -38,7 +36,7 @@ const (
 type Game struct {
 	debugui      debugui.DebugUI
 	sprites      Sprites
-	drawOps      []ebiten.DrawImageOptions
+	op           ebiten.DrawImageOptions
 	inited       bool
 	screenWidth  int
 	screenHeight int
@@ -75,7 +73,6 @@ func (g *Game) init() {
 
 	g.sprites.sprites = make([]*Sprite, MaxSprites)
 	g.sprites.num = 500
-	g.drawOps = make([]ebiten.DrawImageOptions, MaxSprites)
 	for i := range g.sprites.sprites {
 		w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
 		x, y := rand.IntN(g.screenWidth-w), rand.IntN(g.screenHeight-h)
@@ -111,40 +108,22 @@ func (g *Game) Update() error {
 	}
 
 	g.sprites.Update(g.screenWidth, g.screenHeight)
-
-	w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
-	workers := runtime.NumCPU()
-	chunkSize := (g.sprites.num + workers - 1) / workers
-
-	var wg sync.WaitGroup
-	for worker := 0; worker < workers; worker++ {
-		start := worker * chunkSize
-		end := min(start+chunkSize, g.sprites.num)
-		if start >= g.sprites.num {
-			break
-		}
-
-		wg.Add(1)
-		go func(start, end int) {
-			defer wg.Done()
-			for i := start; i < end; i++ {
-				s := g.sprites.sprites[i]
-				g.drawOps[i].GeoM.Reset()
-				g.drawOps[i].GeoM.Translate(-float64(w)/2, -float64(h)/2)
-				g.drawOps[i].GeoM.Rotate(2 * math.Pi * float64(s.angle) / maxAngle)
-				g.drawOps[i].GeoM.Translate(float64(w)/2, float64(h)/2)
-				g.drawOps[i].GeoM.Translate(float64(s.x), float64(s.y))
-			}
-		}(start, end)
-	}
-	wg.Wait()
-
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	w, h := g.ebitenImage.Bounds().Dx(), g.ebitenImage.Bounds().Dy()
 	for i := 0; i < g.sprites.num; i++ {
-		screen.DrawImage(g.ebitenImage, &g.drawOps[i])
+		s := g.sprites.sprites[i]
+		// Reset the geometry matrix for the current sprite.
+		g.op.GeoM.Reset()
+		// Move origin to the center of the image to rotate around the center.
+		g.op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+		g.op.GeoM.Rotate(2 * math.Pi * float64(s.angle) / maxAngle)
+		// Move origin back and translate to the sprite's position.
+		g.op.GeoM.Translate(float64(w)/2, float64(h)/2)
+		g.op.GeoM.Translate(float64(s.x), float64(s.y))
+		screen.DrawImage(g.ebitenImage, &g.op)
 	}
 
 	g.debugui.Draw(screen)

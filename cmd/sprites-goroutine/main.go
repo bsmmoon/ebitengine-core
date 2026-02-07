@@ -17,7 +17,7 @@ package main
 import (
 	"log"
 
-	"github.com/bsmmoon/ebitengine-core/internal/sprites"
+	"github.com/bsmmoon/ebitengine-core/internal/sprites-goroutine"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

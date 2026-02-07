@@ -33,7 +33,7 @@ import (
 const (
 	InitialCount = 500
 	MinSprites   = 0
-	MaxSprites   = 100000
+	MaxSprites   = 200000
 )
 
 type Game struct {

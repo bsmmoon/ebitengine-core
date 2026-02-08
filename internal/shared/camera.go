@@ -22,32 +22,38 @@ import (
 
 // Camera2D represents a 2D camera with pan and zoom capabilities.
 type Camera2D struct {
-	X, Y         float64
-	Scale        float64
-	ScaleTo      float64
-	MinScale     float64
-	MaxScale     float64
-	mousePanX    int
-	mousePanY    int
-	interpolation float64
+	X, Y              float64
+	Scale             float64
+	ScaleTo           float64
+	MinScale          float64
+	MaxScale          float64
+	ZoomSpeed         float64 // Zoom sensitivity (default: 7.0)
+	PanSpeed          float64 // Pan speed (default: 7.0)
+	MousePanSensitivity float64 // Mouse pan sensitivity (default: 100.0)
+	mousePanX         int
+	mousePanY         int
+	interpolation     float64
 }
 
 // NewCamera2D creates a new Camera2D with default settings.
 func NewCamera2D() *Camera2D {
 	return &Camera2D{
-		Scale:         1.0,
-		ScaleTo:       1.0,
-		MinScale:      0.01,
-		MaxScale:      100.0,
-		mousePanX:     math.MinInt32,
-		mousePanY:     math.MinInt32,
-		interpolation: 10.0,
+		Scale:               1.0,
+		ScaleTo:             1.0,
+		MinScale:            0.01,
+		MaxScale:            100.0,
+		ZoomSpeed:           7.0,
+		PanSpeed:            7.0,
+		MousePanSensitivity: 100.0,
+		mousePanX:           math.MinInt32,
+		mousePanY:           math.MinInt32,
+		interpolation:       10.0,
 	}
 }
 
 // HandleZoom processes zoom input and updates target scale.
 func (c *Camera2D) HandleZoom(scrollY float64) {
-	c.ScaleTo += scrollY * (c.ScaleTo / 7)
+	c.ScaleTo += scrollY * (c.ScaleTo / c.ZoomSpeed)
 	if c.ScaleTo < c.MinScale {
 		c.ScaleTo = c.MinScale
 	} else if c.ScaleTo > c.MaxScale {
@@ -57,7 +63,7 @@ func (c *Camera2D) HandleZoom(scrollY float64) {
 
 // HandleKeyboardPan processes keyboard pan input.
 func (c *Camera2D) HandleKeyboardPan(dx, dy float64) {
-	pan := 7.0 / c.Scale
+	pan := c.PanSpeed / c.Scale
 	c.X += dx * pan
 	c.Y += dy * pan
 }
@@ -70,8 +76,8 @@ func (c *Camera2D) HandleMousePan() bool {
 			c.mousePanX, c.mousePanY = ebiten.CursorPosition()
 		} else {
 			x, y := ebiten.CursorPosition()
-			pan := 7.0 / c.Scale
-			dx, dy := float64(c.mousePanX-x)*(pan/100), float64(c.mousePanY-y)*(pan/100)
+			pan := c.PanSpeed / c.Scale
+			dx, dy := float64(c.mousePanX-x)*(pan/c.MousePanSensitivity), float64(c.mousePanY-y)*(pan/c.MousePanSensitivity)
 			c.X, c.Y = c.X-dx, c.Y+dy
 		}
 		return true
@@ -82,6 +88,7 @@ func (c *Camera2D) HandleMousePan() bool {
 }
 
 // Update smoothly interpolates scale toward target.
+// TECHNIQUE: Smooth zoom transition - creates gradual zoom effect instead of instant jumps.
 func (c *Camera2D) Update() {
 	if c.ScaleTo > c.Scale {
 		c.Scale += (c.ScaleTo - c.Scale) / c.interpolation

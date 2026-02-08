@@ -27,7 +27,7 @@ func NewIsometricProjection(tileSize int) *IsometricProjection {
 }
 
 // CartesianToIso transforms cartesian coordinates into isometric coordinates.
-// Converts 2D grid position (x,y) to diamond-shaped isometric screen position.
+// TECHNIQUE: Isometric projection - converts 2D grid position (x,y) to diamond-shaped screen position.
 // Formula: ix = (x-y) * tileSize/2, iy = (x+y) * tileSize/4
 func (p *IsometricProjection) CartesianToIso(x, y float64) (float64, float64) {
 	ix := (x - y) * float64(p.TileSize/2)

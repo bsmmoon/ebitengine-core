@@ -67,7 +67,7 @@ func (g *Game) Update() error {
 	}
 	g.camera.HandleZoom(scrollY)
 
-	// TECHNIQUE: Smooth zoom transition - interpolate current scale toward target.
+	// Update camera (smooth zoom interpolation happens here).
 	g.camera.Update()
 
 	// Handle keyboard panning.

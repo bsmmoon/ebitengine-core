@@ -1,2 +1,8 @@
 build:
-	GOOS=windows GOARCH=amd64 go build
+	go build -o isometric
+
+run: build
+	./isometric
+
+clean:
+	rm -f isometric isometric.exe

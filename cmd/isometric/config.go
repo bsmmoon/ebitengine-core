@@ -14,26 +14,11 @@
 
 package main
 
-import (
-	"log"
+import "github.com/seokmin/ebitengine-core/internal/isometric"
 
-	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/seokmin/ebitengine-core/internal/isometric"
-)
-
-func main() {
-	ebiten.SetWindowTitle("Isometric (Ebitengine Demo)")
-	ebiten.SetWindowResizable(true)
-
-	cfg := gameConfig()
-	ebiten.SetWindowSize(cfg.ScreenWidth, cfg.ScreenHeight)
-
-	g, err := isometric.NewGame(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err = ebiten.RunGame(g); err != nil {
-		log.Fatal(err)
+func gameConfig() isometric.GameConfig {
+	return isometric.GameConfig{
+		ScreenWidth:  640,
+		ScreenHeight: 480,
 	}
 }

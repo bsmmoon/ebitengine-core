@@ -12,28 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package isometric
 
 import (
-	"log"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/seokmin/ebitengine-core/internal/isometric"
 )
 
-func main() {
-	ebiten.SetWindowTitle("Isometric (Ebitengine Demo)")
-	ebiten.SetWindowResizable(true)
+// Tile represents a space with an x,y coordinate within a Level. Any number of
+// sprites may be added to a Tile.
+type Tile struct {
+	sprites []*ebiten.Image
+}
 
-	cfg := gameConfig()
-	ebiten.SetWindowSize(cfg.ScreenWidth, cfg.ScreenHeight)
+// AddSprite adds a sprite to the Tile.
+func (t *Tile) AddSprite(s *ebiten.Image) {
+	t.sprites = append(t.sprites, s)
+}
 
-	g, err := isometric.NewGame(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err = ebiten.RunGame(g); err != nil {
-		log.Fatal(err)
+// Draw draws the Tile on the screen using the provided options.
+func (t *Tile) Draw(screen *ebiten.Image, options *ebiten.DrawImageOptions) {
+	for _, s := range t.sprites {
+		screen.DrawImage(s, options)
 	}
 }

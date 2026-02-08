@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package isometric
 
 import (
 	"fmt"
@@ -38,13 +38,15 @@ type Game struct {
 }
 
 // NewGame returns a new isometric demo Game.
-func NewGame() (*Game, error) {
+func NewGame(cfg GameConfig) (*Game, error) {
 	l, err := NewLevel()
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new level: %s", err)
 	}
 
 	g := &Game{
+		w:            cfg.ScreenWidth,
+		h:            cfg.ScreenHeight,
 		currentLevel: l,
 		camScale:     1,
 		camScaleTo:   1,

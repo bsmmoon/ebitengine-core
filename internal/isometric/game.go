@@ -113,9 +113,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	// Render level.
 	g.renderLevel(screen)
 
-	// Print game info.
-	info := fmt.Sprintf("KEYS WASD EC R\nSCA  %0.2f\nPOS  %0.0f,%0.0f", g.camera.Scale, g.camera.X, g.camera.Y)
-	g.debugOverlay.DrawWithText(screen, info)
+	// Build debug overlay
+	g.debugOverlay.AddLine("KEYS WASD EC R")
+	g.debugOverlay.AddLine("SCA  %0.2f", g.camera.Scale)
+	g.debugOverlay.AddLine("POS  %0.0f,%0.0f", g.camera.X, g.camera.Y)
+	g.debugOverlay.AddLine("TPS: %0.2f", ebiten.ActualTPS())
+	g.debugOverlay.AddLine("FPS: %0.2f", ebiten.ActualFPS())
+	g.debugOverlay.Render(screen)
 }
 
 // Layout is called when the Game's layout changes.

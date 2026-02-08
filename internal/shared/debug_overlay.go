@@ -21,29 +21,54 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-// DebugOverlay is a simple widget for displaying TPS/FPS debug information.
+// DebugOverlay is a simple widget for displaying debug information.
 type DebugOverlay struct {
-	X, Y    int
-	Visible bool
+	X, Y       int
+	Visible    bool
+	LineHeight int    // Height of each line in pixels (default: 16)
+	lineCount  int    // Tracks number of lines drawn
+	lines      []string // Accumulated lines to draw
 }
 
 // NewDebugOverlay creates a new DebugOverlay at the given position.
 // By default, the overlay is visible.
 func NewDebugOverlay(x, y int) *DebugOverlay {
 	return &DebugOverlay{
-		X:       x,
-		Y:       y,
-		Visible: true,
+		X:          x,
+		Y:          y,
+		Visible:    true,
+		LineHeight: 16,
 	}
 }
 
-// Draw renders the debug overlay showing TPS information.
-func (d *DebugOverlay) Draw(dst *ebiten.Image) {
+// AddLine adds a line of text to the debug overlay.
+// Call this multiple times to build up the debug display, then call Render().
+func (d *DebugOverlay) AddLine(format string, args ...interface{}) {
 	if !d.Visible {
 		return
 	}
-	msg := fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f", ebiten.ActualTPS(), ebiten.ActualFPS())
+	d.lines = append(d.lines, fmt.Sprintf(format, args...))
+}
+
+// Render draws all accumulated lines and clears the buffer.
+// Call AddLine() multiple times, then Render() once per frame.
+func (d *DebugOverlay) Render(dst *ebiten.Image) {
+	if !d.Visible || len(d.lines) == 0 {
+		d.lines = nil
+		return
+	}
+	
+	d.lineCount = len(d.lines)
+	msg := ""
+	for i, line := range d.lines {
+		if i > 0 {
+			msg += "\n"
+		}
+		msg += line
+	}
+	
 	ebitenutil.DebugPrintAt(dst, msg, d.X, d.Y)
+	d.lines = nil // Clear for next frame
 }
 
 // SetVisible sets the visibility of the debug overlay.
@@ -54,21 +79,4 @@ func (d *DebugOverlay) SetVisible(visible bool) {
 // Toggle toggles the visibility of the debug overlay.
 func (d *DebugOverlay) Toggle() {
 	d.Visible = !d.Visible
-}
-
-// DrawWithText renders the debug overlay with custom text prepended.
-func (d *DebugOverlay) DrawWithText(dst *ebiten.Image, text string) {
-	if !d.Visible {
-		return
-	}
-	msg := fmt.Sprintf("%s\nTPS: %0.2f\nFPS: %0.2f", text, ebiten.ActualTPS(), ebiten.ActualFPS())
-	ebitenutil.DebugPrintAt(dst, msg, d.X, d.Y)
-}
-
-// DrawMessage renders a custom message at the specified offset from the overlay position.
-func (d *DebugOverlay) DrawMessage(dst *ebiten.Image, msg string, offsetX, offsetY int) {
-	if !d.Visible {
-		return
-	}
-	ebitenutil.DebugPrintAt(dst, msg, d.X+offsetX, d.Y+offsetY)
 }

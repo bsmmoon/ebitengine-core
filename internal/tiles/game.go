@@ -113,12 +113,14 @@ func (g *Game) Update() error {
 // Draw implements ebiten.Game interface.
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.tileMap.Draw(screen)
-	g.debugOverlay.Draw(screen)
 	
-	// Show last clicked object message
+	// Build debug overlay
+	g.debugOverlay.AddLine("TPS: %0.2f", ebiten.ActualTPS())
+	g.debugOverlay.AddLine("FPS: %0.2f", ebiten.ActualFPS())
 	if g.lastClickedObj != "" {
-		g.debugOverlay.DrawMessage(screen, g.lastClickedObj, 0, 20)
+		g.debugOverlay.AddLine(g.lastClickedObj)
 	}
+	g.debugOverlay.Render(screen)
 }
 
 // Layout implements ebiten.Game interface.

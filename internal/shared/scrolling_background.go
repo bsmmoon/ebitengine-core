@@ -20,15 +20,17 @@ import (
 
 // ScrollingBackground represents a background image that scrolls infinitely.
 type ScrollingBackground struct {
-	image *ebiten.Image
-	x16   int
-	y16   int
+	image  *ebiten.Image
+	x16    int
+	y16    int
+	Repeat int // Number of times to repeat the image (default: 3)
 }
 
 // NewScrollingBackground creates a new ScrollingBackground.
 func NewScrollingBackground(img *ebiten.Image) *ScrollingBackground {
 	return &ScrollingBackground{
-		image: img,
+		image:  img,
+		Repeat: 3, // Default repeat count
 	}
 }
 
@@ -50,10 +52,9 @@ func (s *ScrollingBackground) Draw(screen *ebiten.Image) {
 	x16, y16 := s.x16, s.y16
 	offsetX, offsetY := float64(-x16)/16, float64(-y16)/16
 
-	const repeat = 3
 	w, h := s.image.Bounds().Dx(), s.image.Bounds().Dy()
-	for j := 0; j < repeat; j++ {
-		for i := 0; i < repeat; i++ {
+	for j := 0; j < s.Repeat; j++ {
+		for i := 0; i < s.Repeat; i++ {
 			op := &ebiten.DrawImageOptions{}
 			op.GeoM.Translate(float64(w*i), float64(h*j))
 			op.GeoM.Translate(offsetX, offsetY)

@@ -25,7 +25,7 @@ type InteractiveObject struct {
 //   - UI elements: tileSize=1, bounds in pixels for buttons/widgets
 type InteractionManager struct {
 	objects       []InteractiveObject
-	tileSize      int                                  // Grid size in pixels (1 for pixel-perfect, 16 for 16x16 tiles, etc.)
+	tileSize      int                                 // Grid size in pixels (1 for pixel-perfect, 16 for 16x16 tiles, etc.)
 	onInteraction func(name string, gridX, gridY int) // Callback for any interaction (gridX/gridY in grid coordinates)
 }
 

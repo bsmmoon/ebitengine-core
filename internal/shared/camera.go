@@ -22,17 +22,17 @@ import (
 
 // Camera2D represents a 2D camera with pan and zoom capabilities.
 type Camera2D struct {
-	X, Y              float64
-	Scale             float64
-	ScaleTo           float64
-	MinScale          float64
-	MaxScale          float64
-	ZoomSpeed         float64 // Zoom sensitivity (default: 7.0)
-	PanSpeed          float64 // Pan speed (default: 7.0)
+	X, Y                float64
+	Scale               float64
+	ScaleTo             float64
+	MinScale            float64
+	MaxScale            float64
+	ZoomSpeed           float64 // Zoom sensitivity (default: 7.0)
+	PanSpeed            float64 // Pan speed (default: 7.0)
 	MousePanSensitivity float64 // Mouse pan sensitivity (default: 100.0)
-	mousePanX         int
-	mousePanY         int
-	interpolation     float64
+	mousePanX           int
+	mousePanY           int
+	interpolation       float64
 }
 
 // NewCamera2D creates a new Camera2D with default settings.

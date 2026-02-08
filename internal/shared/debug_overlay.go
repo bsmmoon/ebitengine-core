@@ -42,7 +42,7 @@ func (d *DebugOverlay) Draw(dst *ebiten.Image) {
 	if !d.Visible {
 		return
 	}
-	msg := fmt.Sprintf("TPS: %0.2f", ebiten.ActualTPS())
+	msg := fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f", ebiten.ActualTPS(), ebiten.ActualFPS())
 	ebitenutil.DebugPrintAt(dst, msg, d.X, d.Y)
 }
 
@@ -54,6 +54,15 @@ func (d *DebugOverlay) SetVisible(visible bool) {
 // Toggle toggles the visibility of the debug overlay.
 func (d *DebugOverlay) Toggle() {
 	d.Visible = !d.Visible
+}
+
+// DrawWithText renders the debug overlay with custom text prepended.
+func (d *DebugOverlay) DrawWithText(dst *ebiten.Image, text string) {
+	if !d.Visible {
+		return
+	}
+	msg := fmt.Sprintf("%s\nTPS: %0.2f\nFPS: %0.2f", text, ebiten.ActualTPS(), ebiten.ActualFPS())
+	ebitenutil.DebugPrintAt(dst, msg, d.X, d.Y)
 }
 
 // DrawMessage renders a custom message at the specified offset from the overlay position.

@@ -19,7 +19,6 @@ import (
 
 	"github.com/bsmmoon/ebitengine-core/internal/shared"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
@@ -29,6 +28,7 @@ type Game struct {
 	currentLevel *Level
 	camera       *shared.Camera2D
 	projection   *shared.IsometricProjection
+	debugOverlay *shared.DebugOverlay
 	offscreen    *ebiten.Image
 }
 
@@ -45,6 +45,7 @@ func NewGame(cfg GameConfig) (*Game, error) {
 		currentLevel: l,
 		camera:       shared.NewCamera2D(),
 		projection:   shared.NewIsometricProjection(l.tileSize),
+		debugOverlay: shared.NewDebugOverlay(10, 10),
 	}
 	return g, nil
 }
@@ -113,7 +114,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.renderLevel(screen)
 
 	// Print game info.
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("KEYS WASD EC R\nFPS  %0.0f\nTPS  %0.0f\nSCA  %0.2f\nPOS  %0.0f,%0.0f", ebiten.ActualFPS(), ebiten.ActualTPS(), g.camera.Scale, g.camera.X, g.camera.Y))
+	info := fmt.Sprintf("KEYS WASD EC R\nSCA  %0.2f\nPOS  %0.0f,%0.0f", g.camera.Scale, g.camera.X, g.camera.Y)
+	g.debugOverlay.DrawWithText(screen, info)
 }
 
 // Layout is called when the Game's layout changes.

@@ -14,7 +14,7 @@
 
 package main
 
-import "github.com/seokmin/ebitengine-core/internal/isometric"
+import "github.com/bsmmoon/ebitengine-core/internal/isometric"
 
 func gameConfig() isometric.GameConfig {
 	return isometric.GameConfig{

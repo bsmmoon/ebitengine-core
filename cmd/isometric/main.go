@@ -17,13 +17,13 @@ package main
 import (
 	"log"
 
+	"github.com/bsmmoon/ebitengine-core/internal/isometric"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/seokmin/ebitengine-core/internal/isometric"
 )
 
 func main() {
 	ebiten.SetWindowTitle("Isometric (Ebitengine Demo)")
-	ebiten.SetWindowResizable(true)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 
 	cfg := gameConfig()
 	ebiten.SetWindowSize(cfg.ScreenWidth, cfg.ScreenHeight)

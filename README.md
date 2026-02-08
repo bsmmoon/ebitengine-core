@@ -64,6 +64,11 @@ Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
 
 > This section helps AI assistants efficiently navigate the codebase by providing direct file paths and their purposes, minimizing token usage from exploratory file reads.
 
+**Guidelines for AI Assistants:**
+- **Prioritize shared components:** Always check `internal/shared/` for existing utilities before implementing new functionality
+- **Propose extensions:** If shared components could be extended to support new use cases, ask the user for their opinion before implementing
+- **Consider both functionality and readability:** Evaluate whether abstractions provide syntactic sugar that improves code clarity, not just raw functionality
+
 **Entry Points:**
 - `cmd/{game_name}/main.go` - Each game has a thin main.go that configures and runs the game
 

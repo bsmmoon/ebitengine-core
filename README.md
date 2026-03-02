@@ -20,6 +20,9 @@ The goal of this repository is to provide a "core" minimal ebitengine project re
 - **font** - Text rendering demo with custom fonts and Japanese Kanji
 - **isometric** - Isometric world viewer with camera pan/zoom and procedural generation
 - **sprites** - High-performance sprite rendering with optional goroutine parallelization
+- **animation** - Sprite animation demo using frame-based sprite sheets
+- **infinite_scroll** - Infinite scrolling background demo
+- **runner** - Side-scrolling runner combining animated sprites and scrolling background
 
 ## Project Structure
 
@@ -30,7 +33,10 @@ cmd/                    # Executable entry points
   ├── tiles/            # Tilemap demo
   ├── font/             # Font rendering demo
   ├── isometric/        # Isometric world demo
-  └── sprites/          # Sprite performance demo
+  ├── sprites/          # Sprite performance demo
+  ├── animation/        # Sprite animation demo
+  ├── infinite_scroll/  # Infinite scrolling background demo
+  └── runner/           # Side-scrolling runner demo
 internal/               # Reusable components
   ├── helloworld/       # Hello world logic
   ├── shared/           # Shared utilities (Camera2D, IsometricProjection, InteractionManager, etc.)
@@ -38,10 +44,31 @@ internal/               # Reusable components
   ├── tiles/            # Tiles game implementation
   ├── font/             # Font demo implementation
   ├── isometric/        # Isometric game implementation
-  └── sprites/          # Sprites game implementation
+  ├── sprites/          # Sprites game implementation
+  ├── animation/        # Sprite animation implementation
+  ├── infinite_scroll/  # Infinite scroll implementation
+  └── runner/           # Runner game implementation
 ```
 
 ## Architecture
+
+```mermaid
+graph TD
+    cmd["cmd/{game} · main.go · config.go"]
+
+    subgraph internal
+        game["internal/{game} · game.go · game_config.go"]
+        shared["internal/shared · Camera2D · TileMap · InteractionManager · DebugOverlay · IsometricProjection · ImageUtils"]
+    end
+
+    ext["github.com/hajimehoshi/ebiten/v2"]
+
+    cmd --> game
+    game --> shared
+    cmd --> ext
+    game --> ext
+    shared --> ext
+```
 
 **Package Structure:**
 - `cmd/` - Thin entry points that configure and run games
@@ -73,7 +100,7 @@ Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
 - `cmd/{game_name}/main.go` - Each game has a thin main.go that configures and runs the game
 
 **Configuration:**
-- `go.mod` - Dependencies (Ebitengine v2.8.8)
+- `go.mod` - Dependencies
 - `cmd/{game_name}/config.go` - Game-specific screen and configuration settings
 
 **Core Game Logic:**
@@ -87,3 +114,4 @@ Each game implements `ebiten.Game` interface implicitly (Go's duck typing):
 - `internal/shared/debug_overlay.go` - TPS/FPS debug display widget
 - `internal/shared/tilemap.go` - TileMap component for layered tile rendering
 - `internal/shared/image_utils.go` - Image loading and Spritesheet utilities
+- `internal/shared/isometric.go` - IsometricProjection for coordinate conversion
